@@ -36,7 +36,7 @@ namespace TailSpin.SpaceGame.Web
         /// <param name="id">The identifier of the item to retrieve.</param>
         public Task<T> GetItemAsync(string id)
         {
-            return Task<T>.FromResult(_items.Single(item => item.Id == id));
+            return Task<T>.FromResult(_items.SingleOrDefault(item => item.Id == id));
         }
 
         /// <summary>

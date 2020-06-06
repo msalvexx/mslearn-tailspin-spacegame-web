@@ -50,5 +50,45 @@ namespace Tests
             // Verify that each score's game region matches the provided game region.
             Assert.That(scores, Is.All.Matches<Score>(score => score.GameRegion == gameRegion));
         }
+
+        [TestCase("Milky Way", 6)]
+        [TestCase("Andromeda", 3)]
+        [TestCase("Pinwheel", 3)]
+        [TestCase("NGC 1300", 5)]
+        [TestCase("Messier 82", 4)]
+        public void CountFetchOnlyRequestedItems(string gameRegion, int scoresCountExpected) {
+            // Form the query predicate.
+            // This expression selects all scores for the provided game region.
+            Expression<Func<Score, bool>> queryPredicate = score => (score.GameRegion == gameRegion);
+
+            // Fetch the scores.
+            Task<int> scoresCountTask = _scoreRepository.CountItemsAsync(
+                queryPredicate // the predicate defined above
+            );
+            int scoresCount = scoresCountTask.Result;
+
+            // Verify that each score's game region matches the provided game region.
+            Assert.AreEqual(scoresCount, scoresCountExpected);
+        }
+
+        [TestCase("1")]
+        [TestCase("25")]
+        public void GetExistentItemShouldReturnItem(string id) {
+            // Fetch the scores.
+            Task<Score> scoreTask = _scoreRepository.GetItemAsync(id);
+            Score scoreResult = scoreTask.Result;
+
+            Assert.True(scoreResult.Id == id);
+        }
+
+        [TestCase("0")]
+        [TestCase("26")]
+        public void GetInexistentItemShouldReturnNull(string id) {
+            // Fetch the scores.
+            Task<Score> scoreTask = _scoreRepository.GetItemAsync(id);
+            Score scoreResult = scoreTask.Result;
+
+            Assert.True(scoreResult == null);
+        }
     }
 }
